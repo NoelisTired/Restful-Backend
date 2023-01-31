@@ -1,0 +1,7 @@
+Werkzeug==2.2.2
+mysql-client==0.0.1
+mysql-connector==2.2.9
+mysqlclient==2.1.1
+Flask==2.2.2
+discord.py==2.1.0
+requests==2.26.0

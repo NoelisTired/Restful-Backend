@@ -1,0 +1,27 @@
+{
+    "Api": {
+        "Enabled": true,
+        "Host": "127.0.0.1",
+        "Port": 5000,
+        "Debug": "My API description",
+        "Info": {
+            "Version": "1.0.0",
+            "Last Updated": "2023-01-16"
+        }
+    },
+    "Discord": {
+        "Enabled": true,
+        "Token": "",
+        "Prefix": "!",
+        "OwnerID": 123456789012345678
+    },
+    "Database": {
+        "Host": "127.0.0.1",
+        "Port": 3306,
+        "Login": {
+            "Username": "root",
+            "Password": "password",
+            "Database": "database"
+        }
+    }
+}
