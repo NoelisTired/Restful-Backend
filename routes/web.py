@@ -2,14 +2,13 @@ import threading, json, logging, MySQLdb, time, datetime, base64, random, string
 from flask import request, jsonify, Flask, cli
 from hashlib import sha256
 
-dev = False
 debug = False
 
 class FlaskApp(Flask):
     def __init__(self, name):
         super(FlaskApp, self).__init__(name)
         self.admin = Admin(FlaskApp)
-        self.conf = json.load(open('./conf.json')) if not dev else json.load(open('./devconf.json'))
+        self.conf = json.load(open('./conf.json'))
         try: self.db = MySQLdb.connect(
                     host=self.conf['Database']['Host'],
                     port=self.conf['Database']['Port'],
