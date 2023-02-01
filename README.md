@@ -6,7 +6,7 @@ A Python based project combining a RESTful API with a Discord Bot. The API serve
 
 Clone the repository:
 
-git clone [https://github.com/](https://github.com/)`<NoelisTired>`/Restful-Backend
+git clone [https://github.com/](https://github.com/)`NoelisTired`/Restful-Backend
 
 Install the dependencies:
 
