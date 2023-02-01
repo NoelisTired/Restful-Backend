@@ -18,7 +18,7 @@ class LinkCog(commands.Cog, name="link command"):
 
     @commands.command(
         name="link",
-        usage="",
+        usage="<username>",
         description="Link your account",
         alises=["link", "connect"],
     )
@@ -39,7 +39,7 @@ class LinkCog(commands.Cog, name="link command"):
             await ctx.send(embed=embed, delete_after=10)
             return
         try:
-            embed = discord.Embed(title="Link your account", description="Please enter your Username", color=discord.Color.blue())
+            embed = discord.Embed(title="Link your account", description="Please enter your Password", color=discord.Color.blue())
             embed.set_footer(text=f"Sent at {time.strftime('%H:%M:%S')} | NoelP X")
             sentEmbed = discord.Embed(title="Link your account", description="Please check your dms", color=discord.Color.blue())
             sentEmbed.set_footer(text=f"Sent at {time.strftime('%H:%M:%S')} | NoelP X")
