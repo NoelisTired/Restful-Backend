@@ -14,25 +14,31 @@ class OnCommandErrorCog(commands.Cog, name="on command error"):
 			hour = round(error.retry_after/3600)
 			minute = round(error.retry_after/60)
 			if day > 0:
-				await ctx.send('This command has a cooldown, for '+str(day)+ "day(s)")
+				embed = discord.Embed(title="🟥 Command on cooldown", description=f"This command has a cooldown, for {day} day(s)", color=discord.Color.red())
 			elif hour > 0:
-				await ctx.send('This command has a cooldown, for '+str(hour)+ " hour(s)")
+				embed = discord.Embed(title="🟥 Command on cooldown", description=f"This command has a cooldown, for {hour} hour(s)", color=discord.Color.red())
 			elif minute > 0:
-				await ctx.send('This command has a cooldown, for '+ str(minute)+" minute(s)")
+				embed = discord.Embed(title="🟥 Command on cooldown", description=f"This command has a cooldown, for {minute} minute(s)", color=discord.Color.red())
 			else:
-				await ctx.send(f'This command has a cooldown, for {error.retry_after:.2f} second(s)')
+				embed = discord.Embed(title="🟥 Command on cooldown", description=f"This command has a cooldown, for {error.retry_after:.2f} second(s)", color=discord.Color.red())
+			await ctx.send(embed=embed)
 		elif isinstance(error, CommandNotFound):
 			return
 		elif isinstance(error, MissingPermissions):
-			await ctx.send("You are missing the following permissions: "+", ".join(error.missing_perms))
+			embed = discord.Embed(title="🟥 Missing permissions", description="You are missing the following permissions: "+", ".join(error.missing_perms), color=discord.Color.red())
+			await ctx.send(embed=embed)
 		elif isinstance(error, CheckFailure):
-			await ctx.send("You are not allowed to use this command.")
+			embed = discord.Embed(title="🟥 Check failure", description="You are not allowed to use this command.", color=discord.Color.red())
+			await ctx.send(embed=embed)
 		elif isinstance(error, NotOwner):
-			await ctx.send("You are not the bot owner.")
+			embed = discord.Embed(title="🟥 Not the bot owner", description="You are not the bot owner.", color=discord.Color.red())
+			await ctx.send(embed=embed)
+			return
 		elif isinstance(error, commands.MissingRequiredArgument):
-			await ctx.send(f"Missing required argument: {error.param.name}")
+			embed = discord.Embed(title="🟥 Missing required argument", description=f"Missing required argument: {error.param.name}", color=discord.Color.red())
+			await ctx.send(embed=embed)
+			return
 		else:
-			pass #! Only for debugging
-			print(error)
+			print(error) #! Only for debugging
 async def setup(bot:commands.Bot):
     await bot.add_cog(OnCommandErrorCog(bot))

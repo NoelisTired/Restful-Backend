@@ -9,7 +9,7 @@ class StatusCog(commands.Cog, name="status command"):
     @commands.command(name = "status",
 					usage="",
 					description = "Displays the statusses of the bot and the api",
-                    aliases = ['heartbeat', 'uptime', 'down'])
+                    aliases = ['heartbeat', 'uptime', 'down', 'ping'])
     @commands.cooldown(1, 2, commands.BucketType.member)
     async def status(self, ctx):
         embed = discord.Embed(title="Status", description=f"Bot's ping: {round(self.bot.latency * 1000)}ms\nUptime: {round(time.time() - self.bot_start_time)}s", color=discord.Color.blue())

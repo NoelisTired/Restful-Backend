@@ -15,7 +15,7 @@ class HelpCog(commands.Cog, name="help command"):
         if commandName:
             cmd = next((c for c in self.bot.commands if c.name == commandName.lower() or commandName.lower() in c.aliases), None)
             if cmd:
-                embed = discord.Embed(title=f"{cmd.name.upper()} Command", description="", color=randint(0, 0xffffff))
+                embed = discord.Embed(title=f"{cmd.name.upper()} Command", description="", color=discord.Color.blue())
                 embed.add_field(name="Name", value=cmd.name, inline=False)
                 embed.add_field(name="Aliases", value=", ".join(cmd.aliases) if cmd.aliases else "None", inline=False)
                 embed.add_field(name="Usage", value=f"{self.bot.command_prefix}{cmd.name} {cmd.usage}" if cmd.usage else "None", inline=True)
