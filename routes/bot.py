@@ -1,7 +1,6 @@
 import discord, json, os, asyncio, time, threading, MySQLdb, datetime
 from discord.ext import commands
 
-dev = False
 
 with open("./conf.json", "r") as config: 
 	data = json.load(config)
@@ -17,7 +16,7 @@ class Greetings(commands.Cog):
 		self._last_member = None
 class checkDatabase:
 	def __init__(self):
-		self.conf = json.load(open('./conf.json')) if not dev else json.load(open('./devconf.json'))
+		self.conf = json.load(open('./conf.json'))
 		try: self.db = MySQLdb.connect(
 			host=self.conf["Database"]["Host"],
 			port=self.conf["Database"]["Port"],
