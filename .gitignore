@@ -1,6 +1,6 @@
-# ignore config file
 todo.md
 ```
 __pycache__
+*.pyc
 ```
-conf.json
+*.json

@@ -2,12 +2,11 @@ import discord, json, MySQLdb, asyncio, hashlib
 from discord.ext import commands
 import time
 
-dev = False
 
 class LinkCog(commands.Cog, name="link command"):
     def __init__(self, bot: commands.bot):
         self.bot = bot
-        self.conf = json.load(open('./conf.json')) if not dev else json.load(open('./devconf.json'))
+        self.conf = json.load(open('./conf.json'))
         self.db = MySQLdb.connect(
             host=self.conf["Database"]["Host"],
             port=self.conf["Database"]["Port"],
@@ -37,7 +36,7 @@ class LinkCog(commands.Cog, name="link command"):
                 color=discord.Color.red(),
             )
             embed.set_footer(text=f"Sent at {time.strftime('%H:%M:%S')} | NoelP X")
-            await ctx.author.send(embed=embed, delete_after=10)
+            await ctx.send(embed=embed, delete_after=10)
             return
         try:
             embed = discord.Embed(title="Link your account", description="Please enter your Username", color=discord.Color.blue())
