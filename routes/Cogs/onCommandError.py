@@ -32,7 +32,7 @@ class OnCommandErrorCog(commands.Cog, name="on command error"):
 		elif isinstance(error, commands.MissingRequiredArgument):
 			await ctx.send(f"Missing required argument: {error.param.name}")
 		else:
-			await ctx.send("Unknown error, please refer to the console.")
+			pass #! Only for debugging
 			print(error)
 async def setup(bot:commands.Bot):
     await bot.add_cog(OnCommandErrorCog(bot))

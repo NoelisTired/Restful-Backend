@@ -114,7 +114,19 @@ class Admin:
             return jsonify({"Success": False, "Message": f"Missing argument '{'apikey' if not request.headers.get('apikey') else 'username'}'"})
         if not self.isAllowed(self, request.headers.get('X-Eric-Cartman'), request.headers.get('User-Agent')) or not self.isAdmin(FlaskApp(__name__), request.headers.get('apikey')):
             return jsonify({"Success": False, "Message": "Access Denied"})
-        
+        query = "DELETE FROM users WHERE USERNAME = %s"
+        self.cur.execute(query, (request.headers.get('username'),))
+        self.db.commit()
+        print("%s | [ADMIN] - Removed user %s" % (datetime.datetime.now().strftime("%H:%M:%S"), request.headers.get('username')))
+        return jsonify({"Success": True, "Message": f"Successfully Removed {request.headers.get('username')}"})
+    def add(self) -> str:
+        if not request.headers.get('apikey') or not request.headers.get('username'):
+            return jsonify({"Success": False, "Message": f"Missing argument '{'apikey' if not request.headers.get('apikey') else 'username'}'"})
+        if not self.isAllowed(self, request.headers.get('X-Eric-Cartman'), request.headers.get('User-Agent')) or not self.isAdmin(FlaskApp(__name__), request.headers.get('apikey')):
+            return jsonify({"Success": False, "Message": "Access Denied"})
+        query = "INSERT INTO users (ID, USERNAME, PASSWORD, EMAIL, OAUTH, DISCORD, APIKEY, ADMIN) VALUES (NULL,%s,%s,'EMPTY','EMPTY','EMPTY',%s,0)"
+        self.cur.execute(query, (request.headers.get('username'), request.headers.get('password'), ''.join(random.sample(string.ascii_lowercase, 18)),))
+        self.db.commit()
         
 
 if __name__ != '__main__' and debug != True:
