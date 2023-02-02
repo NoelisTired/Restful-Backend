@@ -18,7 +18,6 @@ if __name__ == "__main__":
     _clear()
     signal.signal(signal.SIGINT, handler)
     conf = json.load(open("./conf.json"))
-    if conf["Api"]["Enabled"]:
-        from routes import web
+    from routes import web
     if conf["Discord"]["Enabled"]:
         from routes import bot

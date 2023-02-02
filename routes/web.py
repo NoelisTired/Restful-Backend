@@ -40,11 +40,15 @@ class FlaskApp(Flask):
             self.cur.execute(query, (apikey,))
             self.db.commit()
             return True if self.cur.rowcount else False
-    def isDuplicate(self, username: str) -> bool:
+    def isDuplicate(self, username: str, discord=None) -> bool:
             #? Checks if the user is already in the database
             #* Prepares the query and executes it, then commits the changes to the database
-            query = "SELECT * FROM users WHERE USERNAME = %s"
-            self.cur.execute(query, (username,))
+            if discord:
+                query = "SELECT * FROM users WHERE USERNAME = %s OR DISCORD = %s"
+                self.cur.execute(query, (username, discord))
+            else:
+                query = "SELECT * FROM users WHERE USERNAME = %s"
+                self.cur.execute(query, (username,))
             self.db.commit()
             return True if self.cur.rowcount else False
     def isAllowed(self, key: str, ua: str) -> bool:
@@ -67,14 +71,14 @@ class FlaskApp(Flask):
         username, password, apikey = request.headers.get('username'),\
                                 sha256(request.headers.get('password').encode()).hexdigest(),\
                                     ''.join(random.sample(string.ascii_lowercase, 18))
-        if self.isDuplicate(username):
+        if self.isDuplicate(username, request.headers.get('discord') if request.headers.get('discord') else None):
             return jsonify({"Success": False, "Message": "User already exists"})
         if not request.headers.get('username') or not request.headers.get('password'):
             return jsonify({"Success": False, "Message": f"Missing argument '{'username' if not request.headers.get('username') else 'password'}'"})
-        query = "INSERT INTO users (ID, USERNAME, PASSWORD, EMAIL, OAUTH, DISCORD, APIKEY, ADMIN) VALUES (NULL,%s,%s,'EMPTY','EMPTY','EMPTY',%s,0)"
-        self.cur.execute(query, (username, password, apikey,))
+        query = "INSERT INTO users (ID, USERNAME, PASSWORD, EMAIL, OAUTH, DISCORD, APIKEY, ADMIN) VALUES (NULL,%s,%s,'EMPTY','EMPTY',%s,%s,0)"
+        self.cur.execute(query, (username, password, request.headers.get('discord') if request.headers.get('discord') else "EMPTY", apikey,))
         self.db.commit()
-        print("%s | [API] - Registered user %s" % (datetime.datetime.now().strftime("%H:%M:%S"), username))
+        [print("%s | [API] - Registered user %s" % (datetime.datetime.now().strftime("%H:%M:%S"), username)) if not request.headers.get('discord') else print("%s | [Discord] - Registered user %s with discord %s" % (datetime.datetime.now().strftime("%H:%M:%S"), username, request.headers.get('discord')))]
         return jsonify({"Success": True, "Message": f"Successfully logged in as {username}, Your account is not yet verified", "Time": time.time() - start})
     
     def login(self) -> dict:
