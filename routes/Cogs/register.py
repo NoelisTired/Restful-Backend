@@ -1,4 +1,4 @@
-import discord, json, time, MySQLdb, datetime, hashlib, asyncio, random, string
+import discord, json, time, requests, datetime, hashlib, asyncio, random, string, base64
 from discord.ext import commands
 
 class RegisterCog(commands.Cog, name="register command"):
@@ -6,20 +6,8 @@ class RegisterCog(commands.Cog, name="register command"):
         self.bot = bot
         self.conf = json.load(open('./conf.json'))
         self.bot_start_time = time.time()
-        self.db = MySQLdb.connect(
-            host=self.conf["Database"]["Host"],
-            port=self.conf["Database"]["Port"],
-            user=self.conf["Database"]["Login"]["Username"],
-            passwd=self.conf["Database"]["Login"]["Password"],
-            db=self.conf["Database"]["Login"]["Database"])
-        self.cur = self.db.cursor()
-    def isDuplicate(self, username: str) -> bool:
-        #? Checks if the user is already in the database
-        #* Prepares the query and executes it, then commits the changes to the database
-        query = "SELECT * FROM users WHERE USERNAME = %s"
-        self.cur.execute(query, (username,))
-        self.db.commit()
-        return True if self.cur.rowcount else False
+    def getKey(self) -> str:
+        return hashlib.sha256(base64.b64encode(datetime.datetime.now().strftime("%Y%m%d").encode())).hexdigest()[::-1][::-2]+"END+aHR0cHM6Ly95b3V0dS5iZS9pNjFHLXN1TFZkOD90PTYw"
     @commands.command(name = "register",
 					usage="<username>",
 					description = "Adds you to the database",
@@ -27,19 +15,6 @@ class RegisterCog(commands.Cog, name="register command"):
     @commands.cooldown(1, 2, commands.BucketType.member)
     async def register(self, ctx, username: str) -> None:
         await ctx.message.delete()
-        start = time.time()
-        self.cur.execute(
-            "SELECT * FROM users WHERE DISCORD = %s OR USERNAME = %s", (str(ctx.author.id), str(username),)
-        )
-        if self.cur.rowcount != 0:
-            embed = discord.Embed(
-                title="❌ Error",
-                description="Username or Discord already registered",
-                color=discord.Color.red(),
-            )
-            embed.set_footer(text=f"Sent at {time.strftime('%H:%M:%S')} | NoelP X")
-            await ctx.send(embed=embed, delete_after=10)
-            return
         try:
             embed = discord.Embed(title=f"Account Registration [{username}]", description="Please enter your Password", color=discord.Color.blue())
             embed.set_footer(text=f"Sent at {time.strftime('%H:%M:%S')} | NoelP X")
@@ -64,16 +39,20 @@ class RegisterCog(commands.Cog, name="register command"):
             embed.set_footer(text=f"Sent at {time.strftime('%H:%M:%S')} | NoelP X")
             await ctx.author.send(embed=embed, delete_after=300)
             return
-        username, password, apikey = username,\
-                                hashlib.sha256(password.content.encode()).hexdigest(),\
-                                    ''.join(random.sample(string.ascii_lowercase, 18))
-        query = "INSERT INTO users (ID, USERNAME, PASSWORD, EMAIL, OAUTH, DISCORD, APIKEY, ADMIN) VALUES (NULL,%s,%s,'EMPTY','EMPTY',%s,%s,0)"
-        self.cur.execute(query, (username, password, str(ctx.author.id), apikey,))
-        self.db.commit()
-        print("%s | [Discord] - Registered user %s with discord %s" % (datetime.datetime.now().strftime("%H:%M:%S"), username, str(ctx.author.id)))
-        embed = discord.Embed(title="Account Registration", description="✅ Your account has successfully been registered", color=discord.Color.green())
-        embed.set_footer(text=f"Sent at {time.strftime('%H:%M:%S')} | NoelP X")
-        await ctx.author.send(embed=embed)
+        r = requests.get(f"http://{self.conf['Api']['Host']}:{self.conf['Api']['Port']}/api/v1/register", headers={"User-Agent": "NoelP X - Python Requests","X-Eric-Cartman": self.getKey(),"username": username,"password": password.content, "discord": str(ctx.author.id)}).json()
+        if r['Message'] == "User already exists":
+            embed = discord.Embed(
+                title="❌ Error",
+                description="Username or Discord already registered",
+                color=discord.Color.red(),
+            )
+            embed.set_footer(text=f"Sent at {time.strftime('%H:%M:%S')} | NoelP X")
+            await ctx.author.send(embed=embed, delete_after=10)
+            return
+        elif "Successfully" in r["Message"]:
+            embed = discord.Embed(title="Account Registration", description="✅ Your account has successfully been registered", color=discord.Color.green())
+            embed.set_footer(text=f"Sent at {time.strftime('%H:%M:%S')} | NoelP X")
+            await ctx.author.send(embed=embed)
 
 async def setup(bot:commands.Bot):
     await bot.add_cog(RegisterCog(bot))
